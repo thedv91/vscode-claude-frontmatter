@@ -38,10 +38,29 @@ jobs:
 
       - run: bunx @vscode/vsce package --no-dependencies
 
+      # A version can already be up because it was uploaded by hand, or because
+      # this release is being re-run. Neither is an error, and the Marketplace
+      # refuses to overwrite a version, so ask before trying.
+      - name: Check whether this version is already published
+        id: published
+        run: echo "already=$(node scripts/is-published.mjs)" >> "$GITHUB_OUTPUT"
+
       - name: Publish to the VS Code Marketplace
+        if: steps.published.outputs.already != 'true'
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        run: bunx @vscode/vsce publish --no-dependencies --packagePath *.vsix
+        run: |
+          if [ -z "$VSCE_PAT" ]; then
+            echo "VSCE_PAT is not set. Add it as a repository secret — see the Publishing section of the README." >&2
+            exit 1
+          fi
+          bunx @vscode/vsce publish --no-dependencies --packagePath ./*.vsix
+
+      - name: Note the skipped publish
+        if: steps.published.outputs.already == 'true'
+        env:
+          TAG: ${{ github.ref_name }}
+        run: echo "::notice::$TAG is already on the Marketplace; publish skipped."
 
       - name: Attach the vsix to the GitHub release
         env:

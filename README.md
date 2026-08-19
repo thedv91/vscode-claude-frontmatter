@@ -101,6 +101,11 @@ this repo:
    verifies the tag matches `package.json`, publishes, and attaches the vsix to
    a GitHub release.
 
+The release is safe to re-run. `scripts/is-published.mjs` asks the Marketplace
+which versions are already up, and the publish step is skipped when this one is
+among them — so a build uploaded by hand, or an old tag re-run, ends green
+instead of failing on a version the Marketplace refuses to overwrite.
+
 ## License
 
 MIT
