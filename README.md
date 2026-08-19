@@ -36,9 +36,14 @@ silently.
 | `.claude/rules/**/*.md` | [rule](https://code.claude.com/docs/en/memory#path-specific-rules) |
 | `.claude/agents/**/*.md` | [subagent](https://code.claude.com/docs/en/sub-agents) |
 
-## Setup
+## Install
 
-Install the extension. Nothing to configure.
+```bash
+code --install-extension thedv91.claude-frontmatter     # VS Code
+cursor --install-extension thedv91.claude-frontmatter   # Cursor, Windsurf, VSCodium
+```
+
+Nothing to configure.
 
 VS Code disables suggestions inside markdown by default, so add this if
 completions only appear on <kbd>Ctrl</kbd>+<kbd>Space</kbd>:
@@ -90,21 +95,42 @@ Three places the documentation misleads, each of which cost real debugging time:
 
 ## Publishing
 
-Publishing needs a Marketplace publisher and a token, neither of which lives in
-this repo:
+A release goes to two registries. The Microsoft Marketplace serves VS Code;
+Cursor, Windsurf, VSCodium and Gitpod read Open VSX instead, because Microsoft
+does not serve its Marketplace to non-VS Code products. Publishing to only one
+leaves half the users on manual `.vsix` installs with no updates.
+
+Neither set of credentials lives in this repo.
+
+**VS Code Marketplace**
 
 1. Create a publisher at <https://marketplace.visualstudio.com/manage> and set
    `publisher` in `package.json` to its id.
-2. Create an Azure DevOps personal access token with **Marketplace → Manage**,
-   and save it as the `VSCE_PAT` repository secret.
-3. Bump the version, tag it `vX.Y.Z`, and push the tag. `.github/workflows/release.yml`
+2. Create an Azure DevOps personal access token with **Marketplace → Manage**
+   and organization **All accessible organizations**, then
+   `gh secret set VSCE_PAT`.
+
+**Open VSX**
+
+3. Create an <https://accounts.eclipse.org> account whose GitHub username
+   matches the one that owns this repo, and sign the Publisher Agreement at
+   <https://open-vsx.org/user-settings/extensions>.
+4. Generate a token under **open-vsx.org → avatar → Settings → Access Tokens**,
+   then `gh secret set OVSX_PAT`. The release creates the namespace on first
+   use.
+
+**Then**
+
+5. Bump the version, tag it `vX.Y.Z`, and push the tag. `.github/workflows/release.yml`
    verifies the tag matches `package.json`, publishes, and attaches the vsix to
    a GitHub release.
 
-The release is safe to re-run. `scripts/is-published.mjs` asks the Marketplace
-which versions are already up, and the publish step is skipped when this one is
-among them — so a build uploaded by hand, or an old tag re-run, ends green
-instead of failing on a version the Marketplace refuses to overwrite.
+The release is safe to re-run. `scripts/is-published.mjs` asks each registry
+which versions are already up (`--ovsx` for the second), and a publish step is
+skipped when this version is among them — so a build uploaded by hand, or an
+old tag re-run, ends green instead of failing on a version neither registry
+will overwrite. A missing `OVSX_PAT` warns and continues; a missing `VSCE_PAT`
+fails, since the Marketplace is the primary target.
 
 ## License
 

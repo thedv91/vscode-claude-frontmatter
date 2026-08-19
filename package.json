@@ -43,7 +43,8 @@
     "install:local": "bun run package && code --install-extension claude-frontmatter-0.1.0.vsix",
     "publish:marketplace": "bun run check && bunx @vscode/vsce publish --no-dependencies",
     "smoke": "node scripts/smoke.mjs",
-    "icon": "python3 scripts/make-icon.py"
+    "icon": "python3 scripts/make-icon.py",
+    "publish:ovsx": "bun run check && bunx @vscode/vsce package --no-dependencies && bunx ovsx publish ./*.vsix"
   },
   "dependencies": {
     "yaml": "^2.9.0",
@@ -52,6 +53,7 @@
   "devDependencies": {
     "@types/bun": "latest",
     "@types/vscode": "^1.94.0",
+    "ovsx": "^1.1.1",
     "typescript": "^5.9.3"
   }
 }
