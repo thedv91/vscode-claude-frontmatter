@@ -8,6 +8,7 @@ schemas/**
 bun.lock
 tsconfig.json
 CLAUDE.md
+CONTRIBUTING.md
 .cursor/**
 **/*.map
 .gitignore

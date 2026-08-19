@@ -3,3 +3,6 @@ node_modules
 *.vsix
 .DS_Store
 *.tsbuildinfo
+.serena
+.codegraph
+*.local.*

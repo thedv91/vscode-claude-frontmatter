@@ -55,7 +55,7 @@ jobs:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
           if [ -z "$VSCE_PAT" ]; then
-            echo "VSCE_PAT is not set. Add it as a repository secret — see the Publishing section of the README." >&2
+            echo "VSCE_PAT is not set. Add it as a repository secret — see the Publishing section of CONTRIBUTING.md." >&2
             exit 1
           fi
           bunx @vscode/vsce publish --no-dependencies --packagePath ./*.vsix
