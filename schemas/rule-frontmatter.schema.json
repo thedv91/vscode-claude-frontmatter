@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "paths": {
+      "description": "Glob patterns scoping the rule to matching files. When set, the rule loads only when Claude reads a matching file, rather than at launch. Brace expansion is supported; the whole list shares a budget of 1000 expanded patterns and 4 MiB.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

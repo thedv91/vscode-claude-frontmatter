@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Unique identifier using lowercase letters and hyphens. Hooks receive this as `agent_type`. The filename does not have to match."
+    },
+    "description": {
+      "type": "string",
+      "description": "When Claude should delegate to this subagent."
+    },
+    "tools": {
+      "description": "Tools the subagent can use. Omit to inherit every tool available to subagents. If no entry resolves to a real tool the subagent fails to launch. To preload skills, use `skills` rather than listing `Skill` here.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "disallowedTools": {
+      "description": "Tools to deny, removed from the inherited or specified list.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "model": {
+      "description": "Model to use. Defaults to `inherit`.",
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "inherit",
+            "opus",
+            "sonnet",
+            "haiku",
+            "fable",
+            "claude-opus-5",
+            "claude-sonnet-5",
+            "claude-fable-5",
+            "claude-haiku-4-5-20251001"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "permissionMode": {
+      "description": "Permission mode for the subagent. `manual` is an alias for `default` and requires v2.1.200+. Ignored for plugin subagents. Default: inherits from the parent session.",
+      "type": "string",
+      "enum": [
+        "default",
+        "manual",
+        "acceptEdits",
+        "auto",
+        "dontAsk",
+        "bypassPermissions",
+        "plan"
+      ]
+    },
+    "maxTurns": {
+      "description": "Maximum number of agentic turns before the subagent stops.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "skills": {
+      "description": "Skills to preload into the subagent’s context at startup. The full skill content is injected, not just the description. Unlisted project, user, and plugin skills remain invocable through the Skill tool.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "mcpServers": {
+      "description": "MCP servers available to this subagent. Each entry is either the name of an already-configured server, or an inline definition keyed by server name. Ignored for plugin subagents.",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        ]
+      }
+    },
+    "hooks": {
+      "description": "Lifecycle hooks scoped to this subagent. Ignored for plugin subagents. See https://code.claude.com/docs/en/sub-agents#define-hooks-for-subagents.",
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "memory": {
+      "description": "Persistent memory scope, enabling cross-session learning. The subagent gets its own memory directory — the main conversation’s auto memory is not loaded into it.",
+      "type": "string",
+      "enum": [
+        "user",
+        "project",
+        "local"
+      ]
+    },
+    "background": {
+      "description": "Set true to keep this subagent in the background even when Claude asks to run it in the foreground. Default: false.",
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string",
+          "pattern": "^(true|false|yes|no|on|off|1|0)$"
+        }
+      ]
+    },
+    "effort": {
+      "description": "Effort level while this subagent is active; overrides the session level. Available levels depend on the model. Default: inherits from session.",
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ]
+    },
+    "isolation": {
+      "description": "Set to `worktree` to run the subagent in a temporary git worktree — an isolated copy of the repository branched from your default branch rather than the parent session’s HEAD. Cleaned up automatically if the subagent makes no changes.",
+      "type": "string",
+      "const": "worktree"
+    },
+    "color": {
+      "description": "Display color for the subagent in the task list and transcript.",
+      "type": "string",
+      "enum": [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "pink",
+        "cyan"
+      ]
+    },
+    "initialPrompt": {
+      "description": "Auto-submitted as the first user turn when this agent runs as the main session agent (via --agent or the `agent` setting). Commands and skills are processed. Prepended to any user-provided prompt.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "description"
+  ],
+  "additionalProperties": false
+}

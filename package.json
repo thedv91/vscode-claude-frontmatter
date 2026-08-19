@@ -1,0 +1,55 @@
+{
+  "name": "claude-frontmatter",
+  "displayName": "Claude Frontmatter",
+  "description": "Completion and validation for the YAML frontmatter of Claude Code SKILL.md, command, rule, and subagent files.",
+  "version": "0.1.0",
+  "publisher": "thedv91",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.94.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "keywords": [
+    "claude",
+    "claude code",
+    "skill",
+    "frontmatter",
+    "subagent"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thedv91/vscode-claude-frontmatter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thedv91/vscode-claude-frontmatter/issues"
+  },
+  "homepage": "https://github.com/thedv91/vscode-claude-frontmatter#readme",
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:markdown"
+  ],
+  "contributes": {},
+  "scripts": {
+    "build": "bun build src/extension.ts --outdir dist --target node --format cjs --external vscode --minify",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "check": "bun run typecheck && bun test && bun run build && bun run smoke",
+    "schema:emit": "bun run scripts/emit-json-schema.ts",
+    "package": "bun run check && bunx @vscode/vsce package --no-dependencies",
+    "install:local": "bun run package && code --install-extension claude-frontmatter-0.1.0.vsix",
+    "publish:marketplace": "bun run check && bunx @vscode/vsce publish --no-dependencies",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/vscode": "^1.94.0",
+    "typescript": "^5.9.3"
+  }
+}

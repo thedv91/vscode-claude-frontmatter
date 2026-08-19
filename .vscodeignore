@@ -1,0 +1,14 @@
+.github/**
+.vscode/**
+node_modules/**
+src/**
+test/**
+scripts/**
+schemas/**
+bun.lock
+tsconfig.json
+CLAUDE.md
+.cursor/**
+**/*.map
+.gitignore
+.editorconfig
