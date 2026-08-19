@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "publisher": "thedv91",
   "license": "MIT",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.94.0"
   },
@@ -41,7 +42,8 @@
     "package": "bun run check && bunx @vscode/vsce package --no-dependencies",
     "install:local": "bun run package && code --install-extension claude-frontmatter-0.1.0.vsix",
     "publish:marketplace": "bun run check && bunx @vscode/vsce publish --no-dependencies",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "icon": "python3 scripts/make-icon.py"
   },
   "dependencies": {
     "yaml": "^2.9.0",

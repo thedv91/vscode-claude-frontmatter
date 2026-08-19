@@ -13,5 +13,6 @@ Initial release.
 - A dedicated schema for `.claude/commands/` files: the same fields as a skill,
   but `name` and `paths` are flagged as having no effect there rather than
   accepted silently.
+- Marketplace icon, drawn from `scripts/make-icon.py`.
 - Schemas defined in zod and introspected for both features, so the two can
   never disagree.
