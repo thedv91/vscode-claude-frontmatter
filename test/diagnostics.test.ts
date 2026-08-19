@@ -115,3 +115,41 @@ describe("ranges", () => {
     expect(found[0]!.severity).toBe("error");
   });
 });
+
+describe("command files", () => {
+  // "Files in .claude/commands/ support the same frontmatter, except `name`
+  // and `paths`, which Claude Code ignores in a command file."
+  it("warns that name has no effect, without calling it invalid", () => {
+    const found = diagnosticsFor("command", "---\nname: deploy\n---\nbody");
+    expect(found).toHaveLength(1);
+    expect(found[0]!.severity).toBe("warning");
+    expect(found[0]!.code).toBe("ignored_field");
+    expect(found[0]!.message).toContain("no effect");
+  });
+
+  it("warns about paths too", () => {
+    const found = diagnosticsFor("command", '---\npaths: "src/**"\n---');
+    expect(found).toHaveLength(1);
+    expect(found[0]!.code).toBe("ignored_field");
+  });
+
+  it("anchors the warning to the key, not the value", () => {
+    const [d] = diagnosticsFor("command", "---\ndescription: x\nname: deploy\n---");
+    expect(d!.start.line).toBe(2);
+    expect(d!.start.character).toBe(0);
+    expect(d!.end.character).toBe(4);
+  });
+
+  it("leaves a command with no ignored fields clean", () => {
+    expect(diagnosticsFor("command", "---\ndescription: deploys\n---")).toEqual([]);
+  });
+
+  it("still reports real violations alongside the ignored-field warning", () => {
+    const found = diagnosticsFor("command", "---\nname: x\neffort: insane\n---");
+    expect(found.map((d) => d.severity).sort()).toEqual(["error", "warning"]);
+  });
+
+  it("does not warn about name in a skill file", () => {
+    expect(diagnosticsFor("skill", "---\nname: x\n---")).toEqual([]);
+  });
+});

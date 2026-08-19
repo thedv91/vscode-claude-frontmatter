@@ -1,6 +1,6 @@
-import { isMap, parseDocument, type Node } from "yaml";
+import { isMap, parseDocument, type Document, type Node } from "yaml";
 import type { FrontmatterKind } from "../schemas";
-import { SCHEMAS } from "../schemas";
+import { IGNORED_FIELDS, SCHEMAS } from "../schemas";
 import {
   locateFrontmatter,
   offsetToPosition,
@@ -21,6 +21,16 @@ function rangeOf(node: Node | null | undefined, offset: number) {
   const range = node?.range;
   if (!range) return null;
   return { start: range[0] + offset, end: range[1] + offset };
+}
+
+/** The range of a top-level key node itself, rather than of its value. */
+function keyRange(doc: Document, key: string, offset: number) {
+  const contents = doc.contents;
+  if (!isMap(contents)) return null;
+  const pair = contents.items.find(
+    (item) => (item.key as { value?: unknown })?.value === key,
+  );
+  return rangeOf(pair?.key as Node | undefined, offset);
 }
 
 function valueAt(data: unknown, path: readonly PropertyKey[]): unknown {
@@ -78,10 +88,30 @@ export function diagnosticsFor(
   }
 
   const data = doc.toJS();
+
+  // Fields the kind parses happily but never acts on. zod cannot surface these
+  // — they are valid — yet writing one is almost always a misunderstanding, so
+  // they get their own warning.
+  const ignored: Diagnostic[] = (IGNORED_FIELDS[kind] ?? [])
+    .filter((field) => data && typeof data === "object" && field in data)
+    .flatMap((field) => {
+      const span = keyRange(doc, field, block.offset);
+      if (!span) return [];
+      return [
+        {
+          message: `"${field}" has no effect in a ${kind} file — Claude Code parses it and ignores it.`,
+          severity: "warning" as const,
+          code: "ignored_field",
+          start: offsetToPosition(text, span.start),
+          end: offsetToPosition(text, span.end),
+        },
+      ];
+    });
+
   // An empty block parses to null and is valid wherever the schema has no
   // required fields; let zod decide rather than special-casing it here.
   const result = SCHEMAS[kind].safeParse(data ?? {});
-  if (result.success) return [];
+  if (result.success) return ignored;
 
   // Fall back to the opening delimiter when a node cannot be located, so a
   // diagnostic is never silently dropped.
@@ -90,39 +120,35 @@ export function diagnosticsFor(
     end: offsetToPosition(text, block.offset + block.source.length),
   };
 
-  return result.error.issues.flatMap((issue): Diagnostic[] => {
-    if (issue.code === "unrecognized_keys") {
-      const contents = doc.contents;
-      return issue.keys.map((key) => {
-        const pair = isMap(contents)
-          ? contents.items.find(
-              (item) => (item.key as { value?: unknown })?.value === key,
-            )
-          : undefined;
-        const span = rangeOf(pair?.key as Node | undefined, block.offset);
-        return {
-          message: `Unrecognized field "${key}". Claude Code ignores it, and packaging the file fails on it.`,
-          severity: "warning" as const,
+  return ignored.concat(
+    result.error.issues.flatMap((issue): Diagnostic[] => {
+      if (issue.code === "unrecognized_keys") {
+        return issue.keys.map((key) => {
+          const span = keyRange(doc, key, block.offset);
+          return {
+            message: `Unrecognized field "${key}". Claude Code ignores it, and packaging the file fails on it.`,
+            severity: "warning" as const,
+            code: issue.code,
+            start: span ? offsetToPosition(text, span.start) : wholeBlock.start,
+            end: span ? offsetToPosition(text, span.end) : wholeBlock.end,
+          };
+        });
+      }
+
+      const node =
+        issue.path.length > 0
+          ? (doc.getIn(issue.path, true) as Node | undefined)
+          : null;
+      const span = rangeOf(node, block.offset);
+      return [
+        {
+          message: messageFor(issue.path, issue.message, data),
+          severity: "error" as const,
           code: issue.code,
           start: span ? offsetToPosition(text, span.start) : wholeBlock.start,
           end: span ? offsetToPosition(text, span.end) : wholeBlock.end,
-        };
-      });
-    }
-
-    const node =
-      issue.path.length > 0
-        ? (doc.getIn(issue.path, true) as Node | undefined)
-        : null;
-    const span = rangeOf(node, block.offset);
-    return [
-      {
-        message: messageFor(issue.path, issue.message, data),
-        severity: "error" as const,
-        code: issue.code,
-        start: span ? offsetToPosition(text, span.start) : wholeBlock.start,
-        end: span ? offsetToPosition(text, span.end) : wholeBlock.end,
-      },
-    ];
-  });
+        },
+      ];
+    }),
+  );
 }

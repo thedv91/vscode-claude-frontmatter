@@ -24,10 +24,15 @@ errors, anchored to the offending key or value rather than the whole block.
 The schema for each file kind is picked from its path, so a subagent file never
 offers `allowed-tools` and a rule file offers only `paths`.
 
+A command file gets its own schema rather than borrowing the skill one. It takes
+the same fields, but `name` and `paths` are inert there — a command is named
+after its file — so writing either is reported as a warning instead of passing
+silently.
+
 | Path | Schema |
 | --- | --- |
 | `**/SKILL.md` | [skill](https://code.claude.com/docs/en/skills#frontmatter-reference) |
-| `.claude/commands/**/*.md` | skill (`name` and `paths` are accepted but ignored) |
+| `.claude/commands/**/*.md` | [command](https://code.claude.com/docs/en/skills#frontmatter-reference) — the skill fields, minus the two that do nothing here |
 | `.claude/rules/**/*.md` | [rule](https://code.claude.com/docs/en/memory#path-specific-rules) |
 | `.claude/agents/**/*.md` | [subagent](https://code.claude.com/docs/en/sub-agents) |
 
@@ -66,7 +71,7 @@ them by hand; CI fails if they are stale.
 
 ### Notes for anyone transcribing the docs
 
-Two things the documentation gets wrong, both of which cost real debugging time:
+Three places the documentation misleads, each of which cost real debugging time:
 
 - `argument-hint: [issue-number]` — the docs' own example — is an unquoted YAML
   flow sequence and parses as a **list**, not a string. Anthropic's own bundled
@@ -75,6 +80,9 @@ Two things the documentation gets wrong, both of which cost real debugging time:
   skills use `tools:` in a `SKILL.md`. It is not in the skill schema here, so it
   is reported as an unrecognized field. If that turns out to be a supported
   alias rather than a mistake in those plugins, the schema should change.
+- The subagent page's field table omits `manual` from `permissionMode`, but the
+  permissions page states Claude Code accepts it as an alias for `default`
+  (v2.1.200+). The schema follows the permissions page.
 
 ## Publishing
 

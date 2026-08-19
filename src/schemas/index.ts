@@ -2,6 +2,7 @@ import { z } from "zod";
 import { stringOrList } from "./shared";
 import { skillFrontmatter } from "./skill";
 import { agentFrontmatter } from "./agent";
+import { commandFrontmatter } from "./command";
 
 /**
  * Frontmatter for a rule under `.claude/rules/`. Only `paths` is documented,
@@ -20,10 +21,21 @@ export type FrontmatterKind = "skill" | "command" | "rule" | "agent";
 
 export const SCHEMAS = {
   skill: skillFrontmatter,
-  command: skillFrontmatter,
+  command: commandFrontmatter,
   rule: ruleFrontmatter,
   agent: agentFrontmatter,
 } as const;
+
+/**
+ * Fields a kind accepts without complaint but never acts on. These are not
+ * schema violations — they parse fine — so they are reported separately, as a
+ * warning, rather than through zod.
+ */
+export const IGNORED_FIELDS: Partial<
+  Record<FrontmatterKind, readonly string[]>
+> = {
+  command: ["name", "paths"],
+};
 
 /**
  * Which schema governs a file, decided purely by its path. Returns null for
@@ -42,4 +54,4 @@ export function kindForPath(filePath: string): FrontmatterKind | null {
   return null;
 }
 
-export { skillFrontmatter, agentFrontmatter };
+export { skillFrontmatter, agentFrontmatter, commandFrontmatter };

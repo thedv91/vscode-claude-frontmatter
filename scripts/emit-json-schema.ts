@@ -11,8 +11,7 @@ import type { FrontmatterKind } from "../src/schemas";
 
 const OUT = new URL("../schemas/", import.meta.url);
 
-// `command` shares the skill schema, so emitting it would duplicate the file.
-const KINDS: FrontmatterKind[] = ["skill", "rule", "agent"];
+const KINDS: FrontmatterKind[] = ["skill", "command", "rule", "agent"];
 
 await mkdir(OUT, { recursive: true });
 

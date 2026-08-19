@@ -146,3 +146,25 @@ describe("value suggestions", () => {
     expect(labels("agent", "---\ncolor: \n---", 1, 7)).toContain("cyan");
   });
 });
+
+describe("command frontmatter", () => {
+  it("offers the same fields as a skill", () => {
+    const skill = labels("skill", "---\n\n---", 1).sort();
+    const command = labels("command", "---\n\n---", 1).sort();
+    expect(command).toEqual(skill);
+  });
+
+  it("tells you name is ignored here", () => {
+    const item = completionsAt("command", "---\n\n---", 1, 0).find(
+      (i) => i.label === "name",
+    );
+    expect(item!.documentation).toContain("Ignored in a command file");
+  });
+
+  it("keeps the skill wording for name in a SKILL.md", () => {
+    const item = completionsAt("skill", "---\n\n---", 1, 0).find(
+      (i) => i.label === "name",
+    );
+    expect(item!.documentation).not.toContain("Ignored in a command file");
+  });
+});
