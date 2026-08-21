@@ -16,6 +16,7 @@ describe("kindForPath", () => {
     ["/w/.claude/commands/deploy.md", "command"],
     ["/w/.claude/rules/style.md", "rule"],
     ["/w/.claude/agents/reviewer.md", "agent"],
+    ["/w/.claude/output-styles/diagrams-first.md", "output-style"],
     ["/w/README.md", null],
     ["/w/docs/.claude-notes/x.md", null],
   ])("maps %s", (path, expected) => {
@@ -79,6 +80,18 @@ describe("field suggestions", () => {
 
   it("offers only paths for a rule", () => {
     expect(labels("rule", "---\n\n---", 1)).toEqual(["paths"]);
+  });
+
+  it("offers the four output-style fields, booleans as a pick-list", () => {
+    expect(labels("output-style", "---\n\n---", 1)).toEqual([
+      "name",
+      "description",
+      "keep-coding-instructions",
+      "force-for-plugin",
+    ]);
+    expect(
+      labels("output-style", "---\nkeep-coding-instructions: \n---", 1, 25),
+    ).toEqual(["true", "false"]);
   });
 
   it("keeps skill and agent fields apart", () => {

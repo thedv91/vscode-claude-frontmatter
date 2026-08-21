@@ -153,3 +153,32 @@ describe("command files", () => {
     expect(diagnosticsFor("skill", "---\nname: x\n---")).toEqual([]);
   });
 });
+
+describe("output styles", () => {
+  it("accepts the documented example", () => {
+    const text =
+      "---\nname: Diagrams first\ndescription: Lead every explanation with a diagram\nkeep-coding-instructions: true\n---\nbody";
+    expect(diagnosticsFor("output-style", text)).toEqual([]);
+  });
+
+  it("accepts a name that is not kebab-case, unlike an agent", () => {
+    expect(diagnosticsFor("output-style", "---\nname: Diagrams first\n---")).toEqual(
+      [],
+    );
+  });
+
+  // `force-for-plugin` only does anything for a style shipped inside a plugin,
+  // and a plugin never keeps its styles under `.claude/output-styles/`.
+  it("warns that force-for-plugin has no effect here", () => {
+    const found = diagnosticsFor("output-style", "---\nforce-for-plugin: true\n---");
+    expect(found).toHaveLength(1);
+    expect(found[0]!.severity).toBe("warning");
+    expect(found[0]!.code).toBe("ignored_field");
+  });
+
+  it("flags a field borrowed from the skill schema", () => {
+    const [diagnostic] = diagnosticsFor("output-style", "---\nmodel: opus\n---");
+    expect(diagnostic!.severity).toBe("warning");
+    expect(diagnostic!.message).toContain("model");
+  });
+});

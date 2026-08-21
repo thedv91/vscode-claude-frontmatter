@@ -99,7 +99,9 @@ export function diagnosticsFor(
       if (!span) return [];
       return [
         {
-          message: `"${field}" has no effect in a ${kind} file — Claude Code parses it and ignores it.`,
+          // Phrased without an article so every kind name reads correctly —
+          // "a output-style file" would not.
+          message: `"${field}" has no effect in ${kind} files — Claude Code parses it and ignores it.`,
           severity: "warning" as const,
           code: "ignored_field",
           start: offsetToPosition(text, span.start),

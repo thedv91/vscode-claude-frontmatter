@@ -26,7 +26,7 @@ them by hand; CI fails if they are stale.
 
 ### Notes for anyone transcribing the docs
 
-The README's *Known quirks* section lists the three places the documentation
+The README's *Known quirks* section lists the four places the documentation
 misleads, each of which cost real debugging time. One of them is an open
 question rather than a settled decision: the docs describe `tools:` for
 subagents only, yet several first-party plugin skills use `tools:` in a
@@ -51,6 +51,15 @@ Neither set of credentials lives in this repo.
    and organization **All accessible organizations**, then
    `gh secret set VSCE_PAT`.
 
+   Minting that token needs an Azure DevOps organization, and creating one now
+   requires an active Azure subscription — so this secret is currently unset and
+   the release skips the Marketplace. Until it exists, publish by uploading the
+   vsix attached to the GitHub release at
+   <https://marketplace.visualstudio.com/manage>, which needs only the Microsoft
+   account that owns the publisher. `vsce` grew a `--oidc` flag that would
+   replace the token with a GitHub Actions trusted-publishing exchange, but it
+   is unreleased: neither `latest` (3.9.2) nor `next` (3.9.3-5) carries it.
+
 **Open VSX**
 
 3. Create an <https://accounts.eclipse.org> account whose GitHub username
@@ -70,5 +79,6 @@ The release is safe to re-run. `scripts/is-published.mjs` asks each registry
 which versions are already up (`--ovsx` for the second), and a publish step is
 skipped when this version is among them — so a build uploaded by hand, or an
 old tag re-run, ends green instead of failing on a version neither registry
-will overwrite. A missing `OVSX_PAT` warns and continues; a missing `VSCE_PAT`
-fails, since the Marketplace is the primary target.
+will overwrite. A missing token — either one — warns and continues, so a release
+still ends green while one registry is published to by hand. Read the run's
+annotations to see which of the two was skipped.

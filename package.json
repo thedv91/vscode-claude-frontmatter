@@ -1,7 +1,7 @@
 {
   "name": "claude-frontmatter",
   "displayName": "Claude Frontmatter",
-  "description": "Completion and validation for the YAML frontmatter of Claude Code SKILL.md, command, rule, and subagent files.",
+  "description": "Completion and validation for the YAML frontmatter of Claude Code SKILL.md, command, rule, subagent, and output style files.",
   "version": "0.1.0",
   "publisher": "thedv91",
   "license": "MIT",
@@ -18,7 +18,8 @@
     "claude code",
     "skill",
     "frontmatter",
-    "subagent"
+    "subagent",
+    "output style"
   ],
   "repository": {
     "type": "git",

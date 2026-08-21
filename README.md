@@ -3,8 +3,8 @@
 Completion and validation for the YAML frontmatter of [Claude Code](https://code.claude.com/docs)
 definition files, in VS Code.
 
-Claude's `SKILL.md`, command, rule, and subagent files are configured through a
-YAML frontmatter block whose fields are documented but not schema-checked
+Claude's `SKILL.md`, command, rule, subagent, and output style files are
+configured through a YAML frontmatter block whose fields are documented but not schema-checked
 anywhere. A misspelt field name does nothing at all — no error, no warning, the
 skill just quietly behaves as though you never wrote the line. This extension
 makes the block behave like every other config file you edit.
@@ -27,7 +27,8 @@ offers `allowed-tools` and a rule file offers only `paths`.
 A command file gets its own schema rather than borrowing the skill one. It takes
 the same fields, but `name` and `paths` are inert there — a command is named
 after its file — so writing either is reported as a warning instead of passing
-silently.
+silently. An output style gets the same treatment for `force-for-plugin`, which
+only does anything for a style shipped inside a plugin.
 
 | Path | Schema |
 | --- | --- |
@@ -35,6 +36,7 @@ silently.
 | `.claude/commands/**/*.md` | [command](https://code.claude.com/docs/en/skills#frontmatter-reference) — the skill fields, minus the two that do nothing here |
 | `.claude/rules/**/*.md` | [rule](https://code.claude.com/docs/en/memory#path-specific-rules) |
 | `.claude/agents/**/*.md` | [subagent](https://code.claude.com/docs/en/sub-agents) |
+| `.claude/output-styles/**/*.md` | [output style](https://code.claude.com/docs/en/output-styles#frontmatter) |
 
 ## Install
 
@@ -64,7 +66,7 @@ completions only appear on <kbd>Ctrl</kbd>+<kbd>Space</kbd>:
 
 ## Known quirks
 
-Three places where the extension's behaviour follows something other than the
+Four places where the extension's behaviour follows something other than the
 first line of the documentation:
 
 - `argument-hint: [issue-number]` — the docs' own example — is an unquoted YAML
@@ -76,6 +78,10 @@ first line of the documentation:
 - The subagent page's field table omits `manual` from `permissionMode`, but the
   permissions page states Claude Code accepts it as an alias for `default`
   (v2.1.200+). The schema follows the permissions page.
+- A plugin ships output styles in an `output-styles/` directory at its root, not
+  under `.claude/`. That path is left alone — as plugin `commands/` and
+  `agents/` directories are — so `force-for-plugin` is warned about wherever the
+  output style schema does apply.
 
 ## Links
 

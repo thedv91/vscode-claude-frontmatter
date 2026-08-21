@@ -11,7 +11,13 @@ import type { FrontmatterKind } from "../src/schemas";
 
 const OUT = new URL("../schemas/", import.meta.url);
 
-const KINDS: FrontmatterKind[] = ["skill", "command", "rule", "agent"];
+const KINDS: FrontmatterKind[] = [
+  "skill",
+  "command",
+  "rule",
+  "agent",
+  "output-style",
+];
 
 await mkdir(OUT, { recursive: true });
 

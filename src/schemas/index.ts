@@ -3,6 +3,7 @@ import { stringOrList } from "./shared";
 import { skillFrontmatter } from "./skill";
 import { agentFrontmatter } from "./agent";
 import { commandFrontmatter } from "./command";
+import { outputStyleFrontmatter } from "./output-style";
 
 /**
  * Frontmatter for a rule under `.claude/rules/`. Only `paths` is documented,
@@ -17,13 +18,19 @@ export const ruleFrontmatter = z.strictObject({
     ),
 });
 
-export type FrontmatterKind = "skill" | "command" | "rule" | "agent";
+export type FrontmatterKind =
+  | "skill"
+  | "command"
+  | "rule"
+  | "agent"
+  | "output-style";
 
 export const SCHEMAS = {
   skill: skillFrontmatter,
   command: commandFrontmatter,
   rule: ruleFrontmatter,
   agent: agentFrontmatter,
+  "output-style": outputStyleFrontmatter,
 } as const;
 
 /**
@@ -35,6 +42,11 @@ export const IGNORED_FIELDS: Partial<
   Record<FrontmatterKind, readonly string[]>
 > = {
   command: ["name", "paths"],
+  // `.claude/output-styles/` is never a plugin directory — a plugin ships its
+  // styles in an `output-styles/` at the plugin root, a path this extension
+  // does not claim — so `force-for-plugin` is always inert wherever this kind
+  // applies.
+  "output-style": ["force-for-plugin"],
 };
 
 /**
@@ -51,7 +63,13 @@ export function kindForPath(filePath: string): FrontmatterKind | null {
   if (posix.includes("/.claude/commands/")) return "command";
   if (posix.includes("/.claude/rules/")) return "rule";
   if (posix.includes("/.claude/agents/")) return "agent";
+  if (posix.includes("/.claude/output-styles/")) return "output-style";
   return null;
 }
 
-export { skillFrontmatter, agentFrontmatter, commandFrontmatter };
+export {
+  skillFrontmatter,
+  agentFrontmatter,
+  commandFrontmatter,
+  outputStyleFrontmatter,
+};
