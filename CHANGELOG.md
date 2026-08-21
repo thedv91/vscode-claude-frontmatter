@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.1
 
 - A schema for `.claude/output-styles/` files, covering `name`, `description`,
   `keep-coding-instructions`, and `force-for-plugin` — the last flagged as
