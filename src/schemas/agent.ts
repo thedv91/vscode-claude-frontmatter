@@ -40,10 +40,10 @@ export const agentFrontmatter = z.strictObject({
     "sonnet",
     "haiku",
     "fable",
-    "claude-opus-5",
-    "claude-sonnet-5",
-    "claude-fable-5",
-    "claude-haiku-4-5-20251001",
+    "claude-opus-5-5",
+    "claude-sonnet-5-5",
+    "claude-haiku-5-5",
+    "claude-fable-5-1",
   ])
     .optional()
     .describe("Model to use. Defaults to `inherit`."),

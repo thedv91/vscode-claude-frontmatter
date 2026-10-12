@@ -7,7 +7,7 @@
       "type": "string"
     },
     "description": {
-      "description": "What the skill does and when to use it. Claude uses this to decide when to apply the skill. If omitted, the first paragraph of the markdown body is used. Put the key use case first: `description` + `when_to_use` are truncated at 1536 characters in the skill listing.",
+      "description": "What the skill does and when to use it. Claude uses this to decide when to apply the skill. If omitted, the first non-empty line of the markdown body is used. Put the key use case first: `description` + `when_to_use` are truncated at 1536 characters in the skill listing.",
       "type": "string"
     },
     "when_to_use": {
@@ -101,14 +101,17 @@
           "type": "string",
           "enum": [
             "inherit",
+            "best",
             "opus",
             "sonnet",
             "haiku",
             "fable",
-            "claude-opus-5",
-            "claude-sonnet-5",
-            "claude-fable-5",
-            "claude-haiku-4-5-20251001"
+            "opus[1m]",
+            "sonnet[1m]",
+            "claude-opus-5-5",
+            "claude-sonnet-5-5",
+            "claude-haiku-5-5",
+            "claude-fable-5-1"
           ]
         },
         {

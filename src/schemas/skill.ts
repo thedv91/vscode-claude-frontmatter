@@ -13,14 +13,14 @@ export const skillFrontmatter = z.strictObject({
     .string()
     .optional()
     .describe(
-      "Display name shown in skill listings. Defaults to the directory name. In a personal or project skill this sets only the display label — the command still comes from the directory name. In a plugin skill it sets the last segment of the command.",
+      "Command name shown in the / menu. Defaults to the directory name. In a personal or project skill it sets the command you type, unless another command already uses that name; the directory name also invokes the skill. In a plugin skill it sets the last segment of the command and the plugin prefix stays.",
     ),
 
   description: z
     .string()
     .optional()
     .describe(
-      "What the skill does and when to use it. Claude uses this to decide when to apply the skill. If omitted, the first paragraph of the markdown body is used. Put the key use case first: `description` + `when_to_use` are truncated at 1536 characters in the skill listing.",
+      "What the skill does and when to use it. Claude uses this to decide when to apply the skill. If omitted, the first non-empty line of the markdown body is used. Put the key use case first: `description` + `when_to_use` are truncated at 1536 characters in the skill listing.",
     ),
 
   when_to_use: z
@@ -68,14 +68,17 @@ export const skillFrontmatter = z.strictObject({
 
   model: modelValue([
     "inherit",
+    "best",
     "opus",
     "sonnet",
     "haiku",
     "fable",
-    "claude-opus-5",
-    "claude-sonnet-5",
-    "claude-fable-5",
-    "claude-haiku-4-5-20251001",
+    "opus[1m]",
+    "sonnet[1m]",
+    "claude-opus-5-5",
+    "claude-sonnet-5-5",
+    "claude-haiku-5-5",
+    "claude-fable-5-1",
   ])
     .optional()
     .describe(

@@ -12,7 +12,7 @@ export interface FrontmatterBlock {
 /**
  * Locates the leading frontmatter block, or returns null when there is none —
  * which is valid for every kind of Claude definition file. A skill without
- * frontmatter falls back to its first paragraph as the description, and a rule
+ * frontmatter falls back to its first non-empty line as the description, and a rule
  * without one simply loads unconditionally.
  *
  * An unterminated block also returns null: until the closing `---` is typed
