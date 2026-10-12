@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2
+
+- Model suggestions for skills, commands, and subagents now list the current
+  model ids (`claude-opus-5-5`, `claude-sonnet-5-5`, `claude-haiku-5-5`,
+  `claude-fable-5-1`). Skills and commands also suggest `best`, `opus[1m]`,
+  and `sonnet[1m]`.
+- The hover text for a skill's `name` says it sets the `/` command in personal
+  and project skills, and the text for `description` says an omitted value
+  falls back to the first non-empty line of the body.
+
 ## 0.1.1
 
 - A schema for `.claude/output-styles/` files, covering `name`, `description`,
