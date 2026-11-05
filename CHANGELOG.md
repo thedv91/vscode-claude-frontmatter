@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.3
+
+- Subagents accept `autoCompactWindow` (100000 to 1000000), `omitClaudeMd`,
+  and an `experimental` map whose `cacheTtl` takes `5m` or `1h`. Each was
+  reported as an unrecognized field before.
+- A subagent `name` may use capitals, digits and underscores. It is flagged
+  only when Claude Code would skip the file: empty, longer than 256
+  characters, starting with `-`, or containing `:`.
+- A skill `name` is flagged when Claude Code would ignore it: longer than 256
+  characters, holding `<` or `>`, a control, zero-width, direction-changing,
+  private-use or unassigned character, or any blank other than a single space
+  between words. A command file's `name` gets only the existing "no effect"
+  warning.
+- An unknown key inside a nested map is reported at the key, with its full
+  path such as `experimental.cacheTTL`.
+- Completing a map field (`experimental`, `metadata`, `hooks`) puts the cursor
+  on an indented line below it.
+
 ## 0.1.2
 
 - Model suggestions for skills, commands, and subagents now list the current
