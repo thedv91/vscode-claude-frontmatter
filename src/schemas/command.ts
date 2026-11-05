@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { stringOrList } from "./shared";
 import { skillFrontmatter } from "./skill";
 
@@ -15,7 +16,9 @@ import { skillFrontmatter } from "./skill";
  * command that still answers to its filename.
  */
 export const commandFrontmatter = skillFrontmatter.extend({
-  name: skillFrontmatter.shape.name.describe(
+  // Not the skill's `name` schema: its character and length rules would report
+  // errors on a value Claude Code never reads here.
+  name: z.string().optional().describe(
     "Ignored in a command file — the command is named after the file, so `deploy.md` is always `/deploy`. Move the file to `.claude/skills/<name>/SKILL.md` if you need a name of your own.",
   ),
   paths: stringOrList

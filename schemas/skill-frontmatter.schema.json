@@ -4,7 +4,19 @@
   "properties": {
     "name": {
       "description": "Command name shown in the / menu. Defaults to the directory name. In a personal or project skill it sets the command you type, unless another command already uses that name; the directory name also invokes the skill. In a plugin skill it sets the last segment of the command and the plugin prefix stays.",
-      "type": "string"
+      "type": "string",
+      "maxLength": 256,
+      "allOf": [
+        {
+          "pattern": "^[^<>]*$"
+        },
+        {
+          "pattern": "^[^\\p{Cc}\\p{Cf}\\p{Co}\\p{Cn}]*$"
+        },
+        {
+          "pattern": "^(\\S+( \\S+)*)?$"
+        }
+      ]
     },
     "description": {
       "description": "What the skill does and when to use it. Claude uses this to decide when to apply the skill. If omitted, the first non-empty line of the markdown body is used. Put the key use case first: `description` + `when_to_use` are truncated at 1536 characters in the skill listing.",

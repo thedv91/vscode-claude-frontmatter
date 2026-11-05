@@ -11,6 +11,19 @@ import { EFFORT_LEVELS, modelValue, stringOrList, yamlBoolean } from "./shared";
 export const skillFrontmatter = z.strictObject({
   name: z
     .string()
+    // Claude Code ignores a `name` that breaks any of these (v2.1.292 for the
+    // length, v2.1.299 for the characters): the skill still loads, but under
+    // its directory name, so the value the author wrote never reaches the menu.
+    .max(256, "At most 256 characters")
+    .regex(/^[^<>]*$/, "Can't contain `<` or `>`")
+    .regex(
+      /^[^\p{Cc}\p{Cf}\p{Co}\p{Cn}]*$/u,
+      "Can't contain control, zero-width, direction-changing, private-use or unassigned characters",
+    )
+    .regex(
+      /^(\S+( \S+)*)?$/u,
+      "Only single plain spaces between words: no other blanks, and none at the start or end",
+    )
     .optional()
     .describe(
       "Command name shown in the / menu. Defaults to the directory name. In a personal or project skill it sets the command you type, unless another command already uses that name; the directory name also invokes the skill. In a plugin skill it sets the last segment of the command and the plugin prefix stays.",

@@ -76,7 +76,11 @@ export function completionsAt(
       insertText:
         field.values.length > 0
           ? `${field.name}: \${1|${field.values.join(",")}|}`
-          : `${field.name}: \${1}`,
+          : field.detail === "object"
+            ? // A map's entries go on indented lines; a value typed inline is
+              // a type error (`experimental: 1h` instead of `cacheTtl: 1h`).
+              `${field.name}:\n  \${1}`
+            : `${field.name}: \${1}`,
       sortText: `${field.required ? "0" : "1"}${field.name}`,
     }));
 }

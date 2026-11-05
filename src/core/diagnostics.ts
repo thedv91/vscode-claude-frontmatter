@@ -23,11 +23,19 @@ function rangeOf(node: Node | null | undefined, offset: number) {
   return { start: range[0] + offset, end: range[1] + offset };
 }
 
-/** The range of a top-level key node itself, rather than of its value. */
-function keyRange(doc: Document, key: string, offset: number) {
-  const contents = doc.contents;
-  if (!isMap(contents)) return null;
-  const pair = contents.items.find(
+/**
+ * The range of a key node itself, rather than of its value, inside the map at
+ * `parent` (`[]` for the top level).
+ */
+function keyRange(
+  doc: Document,
+  parent: readonly PropertyKey[],
+  key: string,
+  offset: number,
+) {
+  const map = parent.length === 0 ? doc.contents : doc.getIn(parent, true);
+  if (!isMap(map)) return null;
+  const pair = map.items.find(
     (item) => (item.key as { value?: unknown })?.value === key,
   );
   return rangeOf(pair?.key as Node | undefined, offset);
@@ -95,7 +103,7 @@ export function diagnosticsFor(
   const ignored: Diagnostic[] = (IGNORED_FIELDS[kind] ?? [])
     .filter((field) => data && typeof data === "object" && field in data)
     .flatMap((field) => {
-      const span = keyRange(doc, field, block.offset);
+      const span = keyRange(doc, [], field, block.offset);
       if (!span) return [];
       return [
         {
@@ -126,9 +134,11 @@ export function diagnosticsFor(
     result.error.issues.flatMap((issue): Diagnostic[] => {
       if (issue.code === "unrecognized_keys") {
         return issue.keys.map((key) => {
-          const span = keyRange(doc, key, block.offset);
+          // A nested map such as `experimental` reports its own unknown keys.
+          const span = keyRange(doc, issue.path, key, block.offset);
+          const field = [...issue.path, key].join(".");
           return {
-            message: `Unrecognized field "${key}". Claude Code ignores it, and packaging the file fails on it.`,
+            message: `Unrecognized field "${field}". Claude Code ignores it, and packaging the file fails on it.`,
             severity: "warning" as const,
             code: issue.code,
             start: span ? offsetToPosition(text, span.start) : wholeBlock.start,

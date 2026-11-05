@@ -94,6 +94,20 @@ describe("field suggestions", () => {
     ).toEqual(["true", "false"]);
   });
 
+  it("offers the agent fields added in v2.1.248 to v2.1.296", () => {
+    const offered = labels("agent", "---\n\n---", 1);
+    for (const field of ["autoCompactWindow", "omitClaudeMd", "experimental"]) {
+      expect(offered).toContain(field);
+    }
+  });
+
+  it("inserts a map field with its cursor on an indented line", () => {
+    const item = completionsAt("agent", "---\n\n---", 1, 0).find(
+      (s) => s.label === "experimental",
+    );
+    expect(item!.insertText).toBe("experimental:\n  ${1}");
+  });
+
   it("keeps skill and agent fields apart", () => {
     expect(labels("agent", "---\n\n---", 1)).toContain("permissionMode");
     expect(labels("agent", "---\n\n---", 1)).not.toContain("allowed-tools");

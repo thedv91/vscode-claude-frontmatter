@@ -4,8 +4,17 @@
   "properties": {
     "name": {
       "type": "string",
-      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-      "description": "Unique identifier using lowercase letters and hyphens. Hooks receive this as `agent_type`. The filename does not have to match."
+      "minLength": 1,
+      "maxLength": 256,
+      "allOf": [
+        {
+          "pattern": "^(?!-)"
+        },
+        {
+          "pattern": "^[^:]*$"
+        }
+      ],
+      "description": "Unique identifier of at most 256 characters, such as `code-reviewer` or `reviewer-v2`. Hooks receive this as `agent_type`. The filename does not have to match. Can't start with `-` or contain `:`; Claude Code skips the file otherwise."
     },
     "description": {
       "type": "string",
@@ -40,7 +49,7 @@
       ]
     },
     "model": {
-      "description": "Model to use. Defaults to `inherit`.",
+      "description": "Model to use: an alias, a full model id, or `inherit`. When omitted, Claude Code picks the model in the subagent model order.",
       "anyOf": [
         {
           "type": "string",
@@ -79,6 +88,12 @@
       "type": "integer",
       "minimum": 1,
       "maximum": 9007199254740991
+    },
+    "autoCompactWindow": {
+      "description": "Lower the auto-compact window for this subagent to a token count from 100000 to 1000000. It never raises the window, and has no effect while `CLAUDE_CODE_AUTO_COMPACT_WINDOW` sets a smaller one. Requires v2.1.296+.",
+      "type": "integer",
+      "minimum": 100000,
+      "maximum": 1000000
     },
     "skills": {
       "description": "Skills to preload into the subagent’s context at startup. The full skill content is injected, not just the description. Unlisted project, user, and plugin skills remain invocable through the Skill tool.",
@@ -141,6 +156,18 @@
         }
       ]
     },
+    "omitClaudeMd": {
+      "description": "Set true to start this subagent without the user, project, and local CLAUDE.md files. Managed policy files still load. Ignored when the agent runs as the main session agent via --agent or the `agent` setting. Requires v2.1.271+.",
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string",
+          "pattern": "^(true|false|yes|no|on|off|1|0)$"
+        }
+      ]
+    },
     "effort": {
       "description": "Effort level while this subagent is active; overrides the session level. Available levels depend on the model. Default: inherits from session.",
       "type": "string",
@@ -174,6 +201,21 @@
     "initialPrompt": {
       "description": "Auto-submitted as the first user turn when this agent runs as the main session agent (via --agent or the `agent` setting). Commands and skills are processed. Prepended to any user-provided prompt.",
       "type": "string"
+    },
+    "experimental": {
+      "description": "Map of experimental options, written as indented keys below `experimental:`. `cacheTtl` (`5m` or `1h`) is the only one documented. Read only from subagent files.",
+      "type": "object",
+      "properties": {
+        "cacheTtl": {
+          "description": "Prompt cache lifetime for this subagent's requests. `1h` is ignored while a Claude subscription is using usage credits. Requires v2.1.248+.",
+          "type": "string",
+          "enum": [
+            "5m",
+            "1h"
+          ]
+        }
+      },
+      "additionalProperties": false
     }
   },
   "required": [
